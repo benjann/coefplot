@@ -1,4 +1,4 @@
-*! version 1.8.2  22feb2019  Ben Jann
+*! version 1.8.3  07mar2019  Ben Jann
 
 program coefplot
     version 11
