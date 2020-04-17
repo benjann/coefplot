@@ -1,0 +1,2 @@
+v 3
+p coefplot module for plotting regression coefficients and other results
