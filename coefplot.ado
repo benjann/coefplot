@@ -1,4 +1,4 @@
-*! version 1.8.3  07mar2019  Ben Jann
+*! version 1.8.4  17dec2020  Ben Jann
 
 program coefplot
     version 11
@@ -262,10 +262,6 @@ program _coefplot, rclass
     }
     if `"`generate'"'!="" {
         preserve
-        if "`replace'"!="" {
-            capt label drop `generate'by 
-            capt label drop `generate'plot
-        }
         local returnvars
         local i 0
         foreach v in by plot at mlbl mlpos b V se t df pval {
@@ -326,7 +322,6 @@ program _coefplot, rclass
     mata: coefplot_put(COEFPLOT_STRUCT)
     mata: coefplot_apply_transform(COEFPLOT_STRUCT)
     qui compress `at' `df' `plot' `by' `eq' `grp' `mlpos' // not really needed
-
     // get labels
     set_by_and_plot_labels `plot' `by'
     if `"`plotlabels'"'!="" {
@@ -414,14 +409,18 @@ program _coefplot, rclass
         }
     }
     else if `atmode'==0 & `"`offsets'"'=="" & `N_plots'>1 {
-        if "`recycle'"=="" | `n_subgr'==1 {
-            qui replace `at' = `at' - 0.5 + `plot'/(`N_plots'+1)
-        }
-        else {
-            forv j=1/`n_subgr' {
-                qui replace `at' = `at' - 0.5 + ///
-                    (`plot'-`firstplot_`j''+1) / ///
-                    (`lastplot_`j''-`firstplot_`j''+2) if `by'==`j'
+        capt mata: coefplot_at_unique(COEFPLOT_STRUCT) // error if not true
+        if _rc==1 exit _rc
+        if _rc {
+            if "`recycle'"=="" | `n_subgr'==1 {
+                qui replace `at' = `at' - 0.5 + `plot'/(`N_plots'+1)
+            }
+            else {
+                forv j=1/`n_subgr' {
+                    qui replace `at' = `at' - 0.5 + ///
+                        (`plot'-`firstplot_`j''+1) / ///
+                        (`lastplot_`j''-`firstplot_`j''+2) if `by'==`j'
+                }
             }
         }
     }
@@ -1966,6 +1965,7 @@ end
 program set_by_and_plot_labels
     args plot by
     // plot
+    capt label drop `plot'
     qui levelsof `plot', local(levels)
     foreach l of local levels {
         mata: coefplot_get_plotlbl(COEFPLOT_STRUCT, `l') // returns plotlbl
@@ -1973,6 +1973,7 @@ program set_by_and_plot_labels
     }
     lab val `plot' `plot', nofix
     // by
+    capt label drop `by'
     qui levelsof `by', local(levels)
     foreach l of local levels {
         mata: coefplot_get_bylbl(COEFPLOT_STRUCT, `l') // returns bylbl
@@ -3666,6 +3667,11 @@ void coefplot_put(struct coefplot_struct scalar C)
         vi[1,i] = st_varindex(st_local("aux" + strofreal(i)))
     }
     st_store((1,C.r), vi, C.aux)
+}
+
+void coefplot_at_unique(struct coefplot_struct scalar C)
+{
+    assert(rows(uniqrows((C.by,C.at)))==C.r)
 }
 
 void coefplot_apply_transform(struct coefplot_struct scalar C)

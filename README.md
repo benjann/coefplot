@@ -23,6 +23,17 @@ Installation from GitHub:
 
 Main changes:
 
+    17dec2020 (1.8.4)
+    - automatic offsets are no longer added to the plot positions of the 
+      estimates if multiple series are plotted but the coefficients of the series
+      are distinct (such that there is at most one estimate per coefficient)
+    - an "invalid attempt to modify label" error was returned when applying option 
+      -generate()- without -replace- in a situation in which value label definitions
+      from an earlier call to -coefplot, generate()- were still in memory, even
+      though the corresponding variables have been dropped; -coefplot- is now less
+      strict; it now assumes that it is ok to overwrite existing value labels if a
+      variable with the same name could successfully be created
+
     17apr2020
     - installation files added to GitHub distribution
     
