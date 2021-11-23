@@ -23,6 +23,9 @@ Installation from GitHub:
 
 Main changes:
 
+    23nov2021 (1.8.5)
+    - -set dp comma- could break -coefplot-; this is fixed (hopefully)
+    
     17dec2020 (1.8.4)
     - automatic offsets are no longer added to the plot positions of the 
       estimates if multiple series are plotted but the coefficients of the series

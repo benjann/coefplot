@@ -1,4 +1,4 @@
-*! version 1.8.4  17dec2020  Ben Jann
+*! version 1.8.5  23nov2021  Ben Jann
 
 program coefplot
     version 11
@@ -521,7 +521,7 @@ program _coefplot, rclass
                     parse_ciopts_recast_pstyle, `ciopts'
                         // returns cirecast, cipstyle, ciopts
                     if "`nocilwincr_`i''"=="" {
-                        local lw: di 1 + log10(`l')/log10(2)
+                        local lw = string(1 + log10(`l')/log10(2))
                         local lw lwidth(*`lw')
                     }
                     local ciplotcmd rspike `ll`k'' `ul`k'' `at'
@@ -1770,14 +1770,14 @@ program parse_cismooth
         else {
             local l = `d'/2 + (`n'-`i'/2-.5)*`d'
         }
-        local levels `levels' `:di `l''
+        local levels `levels' `=string(`l')'
         local inten = (`imin' + (`imax'-`imin') / (ceil(`n'/2)-1) * ///
             (ceil(`i'/2)-1))/100
-        local intens `intens' `:di `inten''
+        local intens `intens' `=string(`inten')'
         local lw = 4 + (`l'-1)/(`lmax'-1) * (100-4) // if n=50 max lw is 25
         local lw = 100 / `lw'
         local lw = `wmin' + (`lw'-1) / (25-1) * (`wmax'-`wmin')
-        local lwidth `lwidth' `:di `lw''
+        local lwidth `lwidth' `=string(`lw')'
     }
     c_local cis_levels_`j'  `levels'
     c_local cis_n_`j'       `n'
@@ -1990,7 +1990,7 @@ program get_axis_labels
     foreach l of local levels {
         local ++j
         su `x' if `eq'==`l', meanonly
-        local pos: di %9.0g r(min) + (r(max)-r(min))/2
+        local pos = string(r(min) + (r(max)-r(min))/2)
         local pos: list retok pos
         mata: coefplot_get_eqlbl(COEFPLOT_STRUCT, `j') // returns eqlbl
         local eqlabels `eqlabels' `pos' `"`eqlbl'"'
@@ -2004,7 +2004,7 @@ program get_axis_labels
             foreach l of local levels { // equations (from above)
                 su `x' if `grp'==`j' & `eq'==`l', mean
                 if r(N)>0 {
-                    local pos: di %9.0g r(min) + (r(max)-r(min))/2
+                    local pos = string(r(min) + (r(max)-r(min))/2)
                     local pos: list retok pos
                     local glbls `glbls' `pos' `"`glab'"'
                 }
