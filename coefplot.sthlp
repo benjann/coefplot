@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.5.1  22feb2019 Ben Jann}{...}
+{* *! version 1.5.2  21apr2022 Ben Jann}{...}
 {vieweralsosee "[G-2] graph" "help graph"}{...}
 {vieweralsosee "[R] estimates" "help estimates"}{...}
 {vieweralsosee "[R] marginsplot" "help marginsplot"}{...}
@@ -14,7 +14,8 @@
 {viewerjumpto "Author" "coefplot##author"}{...}
 {viewerjumpto "History" "coefplot##history"}{...}
 {hi:help coefplot}{...}
-{right: Also see: {browse "http://repec.sowi.unibe.ch/stata/coefplot"}}
+{right:{browse "http://repec.sowi.unibe.ch/stata/coefplot"}}
+{right:{browse "http://github.com/benjann/coefplot"}}
 {hline}
 
 {title:Title}
@@ -722,7 +723,9 @@
     {manhelpi clockposstyle G-4}). Not all of Stata's plot types
     support marker labels. For example, if you use
     {helpb coefplot##recast:recast(bar)} to change the plot type to
-    {helpb twoway_bar:bar}, no marker labels will be displayed.
+    {helpb twoway_bar:bar}, no marker labels will be displayed (this has
+    changed with the April 6, 2022, update to Stata 17; plot type 
+    {helpb twoway_bar:bar} now displays marker labels).
 
 {marker aux}{...}
 {phang}
@@ -822,7 +825,9 @@
     {helpb coefplot##mlabels:mlabels()} above. Furthermore, note that
     not all of Stata's plot types support marker labels. For example, if you use
     {helpb coefplot##recast:recast(bar)} to change the plot type to
-    {helpb twoway_bar:bar}, no marker labels will be displayed.
+    {helpb twoway_bar:bar}, no marker labels will be displayed (this has
+    changed with the April 6, 2022, update to Stata 17; plot type 
+    {helpb twoway_bar:bar} now displays marker labels).
 
 {pmore}
     The {cmd:mlabel} option can be used in three different ways:
@@ -1789,7 +1794,7 @@
 {title:Author}
 
 {pstd}
-    Ben Jann, University of Bern, ben.jann@soz.unibe.ch
+    Ben Jann, University of Bern, ben.jann@unibe.ch
 
 {pstd}
     Thanks for citing this software in one of the following ways:
