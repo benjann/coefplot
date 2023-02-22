@@ -23,6 +23,12 @@ Installation from GitHub:
 
 Main changes:
 
+    22feb2023 (1.8.6)
+    - option rename() could break if all coefficients of a model were subject to
+      renaming; this is fixed
+    - parsing of 'matchlist' in options such as transform() now binds expressions
+      in parentheses together
+
     23nov2021 (1.8.5)
     - -set dp comma- could break -coefplot-; this is fixed (hopefully)
     

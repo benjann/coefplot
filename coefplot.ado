@@ -1,4 +1,4 @@
-*! version 1.8.5  23nov2021  Ben Jann
+*! version 1.8.6  22feb2023  Ben Jann
 
 program coefplot
     version 11
@@ -2797,9 +2797,9 @@ void coefplot_rename(string scalar rename, real scalar regex,
         rename = coefplot_parse_matchlist(rename, "rename")
         p0 = 1::rows(coef)
         for (i=1; i<=rows(rename); i++) {
-            if (rows(p0)==0) return
             names = coefplot_parse_namelist(rename[i,1], "*", "rename")
             for (j=1; j<=rows(names); j++) {
+                if (rows(p0)==0) return
                 match = (strmatch(eq[p0], names[j,1]) :& regexm(coef[p0], names[j,2]))
                 p = select(p0, match)
                 if (rows(p)==0) continue 
@@ -2812,12 +2812,12 @@ void coefplot_rename(string scalar rename, real scalar regex,
     rename = coefplot_parse_matchlist(rename, "rename")
     p0 = 1::rows(coef)
     for (i=1; i<=rows(rename); i++) {
-        if (rows(p0)==0) return
         // syntax: *abc for suffix rename
         //         abc* for prefix rename
         //         abc for exact rename
         names = coefplot_parse_namelist(rename[i,1], "*", "rename")
         for (j=1; j<=rows(names); j++) {
+            if (rows(p0)==0) return
             if (substr(names[j,2],1,1)=="*") {
                 rl = strlen(names[j,2])-1
                 match = strmatch(eq[p0], names[j,1]) :& 
@@ -3536,7 +3536,6 @@ void coefplot_headings(struct coefplot_struct scalar C)
 string matrix coefplot_parse_matchlist(string scalar s, string scalar opt, 
     | real scalar nc0)
 {
-    transmorphic     t
     real scalar      c, a, b, j, i, nc
     real rowvector   eqpos
     string rowvector stok
@@ -3544,10 +3543,8 @@ string matrix coefplot_parse_matchlist(string scalar s, string scalar opt,
     
     if (args()==3) nc = nc0
     else           nc = 1
-    if (s=="") return(J(0,1+nc,""))
-    t = tokeninit(" ", "=")
-    tokenset(t, s)
-    stok = tokengetall(t)
+    if (strtrim(s)=="") return(J(0, 1+nc, ""))
+    stok = _coefplot_parse_matchlist_stok(s)
     c = cols(stok)
     a = b = i = 1
     eqpos = select(1::c, stok':=="=")'
@@ -3576,6 +3573,47 @@ string matrix coefplot_parse_matchlist(string scalar s, string scalar opt,
             }
     }
     return(res)
+}
+
+string rowvector _coefplot_parse_matchlist_stok(string scalar s)
+{
+    real scalar      i, c, j
+    string scalar    tok, t0
+    string rowvector pchars, stok
+    transmorphic     t
+    
+    // Step 1: split input at blanks and equal signs while binding on quotes
+    // and parentheses
+    pchars = (" ", "=")
+    t = tokeninit("", pchars, (`""""', `"`""'"', "()"))
+    tokenset(t, s)
+    stok = tokengetall(t)
+    // Step 2: remove blanks and merge "(...)" with surrounding tokens (unless
+    // blank or equal sign)
+    c = cols(stok)
+    j = c + 1
+    for (i=c; i; i--) {
+        tok = stok[i]
+        if (tok==" ") continue // remove blanks
+        if (i>1) {
+            if (substr(tok,1,1)=="(") {
+                if (!anyof(pchars, stok[i-1])) {
+                    stok[i-1] = stok[i-1] + tok
+                    continue
+                }
+            }
+            else if (tok!="=") {
+                if (substr(stok[i-1],-1,1)==")") {
+                    stok[i-1] = stok[i-1] + tok
+                    continue
+                }
+            }
+        }
+        stok[--j] = tok
+    }
+    // return result
+    if (j>c) return(J(1,0,""))
+    return(stok[|j \ .|])
 }
 
 string matrix coefplot_parse_namelist(string scalar s, string scalar defeq, 
