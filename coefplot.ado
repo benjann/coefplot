@@ -1,17 +1,46 @@
-*! version 1.8.6  22feb2023  Ben Jann
+*! version 1.8.7  28may2025  Ben Jann
 
 program coefplot
     version 11
+    parse_nodrop `macval(0)' // returns nodrop
+    if "`nodrop'"!="" {
+        _coefplot `macval(0)'
+        exit
+    }
+    if c(stata_version)<16 {
+        preserve
+        qui keep in 1 if 0
+        _coefplot `macval(0)'
+        exit
+    }
+    tempname tmpframe
+    frame put in 1 if 0, into(`tmpframe')
+    frame `tmpframe' {
+        _coefplot `macval(0)'
+    }
+end
+
+program parse_nodrop
+    while (`"`macval(0)'"'!="") {
+        gettoken subgraph 0 : 0, parse("|") bind
+    }
+    _parse comma subgraph 0 : subgraph
+    syntax [, GENerate GENerate2(passthru) NODROP * ]
+    if `"`generate'`generate2'"'!="" local nodrop nodrop
+    c_local nodrop `nodrop'
+end
+
+program _coefplot
     nobreak {
         capt mata: mata drop COEFPLOT_STRUCT
-        capt n break _coefplot `macval(0)'
+        capt n break __coefplot `macval(0)'
         local rc = _rc
         capt mata: mata drop COEFPLOT_STRUCT
         exit `rc'
     }
 end
 
-program _coefplot, rclass
+program __coefplot, rclass
     // get subgraphs and parse global options
     parse_subgraphs `macval(0)'     // returns n_subgr, subgr_#, opts
     parse_globalopts `macval(opts)' // returns expanded global opts and twopts, 
@@ -210,22 +239,19 @@ program _coefplot, rclass
     }
     
     // save results to variables
-    if `"`generate'"'=="" {
-        if (_N > `r') & "`nodrop'"=="" {
-            preserve
-            qui keep in 1/`r'   // remove extra observations to speed up
-        }
-        else if (_N < `r') {
-            preserve
-            qui set obs `r'
-        }
+    if `"`generate'`nodrop'"'=="" {
+        qui set obs `r' // (all obs have been dropped)
     }
-    else {
-        if (_N < `r') {
+    else if (_N < `r') {
+        if `"`generate'"'!="" {
             di as txt "need to create additional observations; " _c
             di as txt "press break to abort"
             more
             set obs `r'
+        }
+        else {
+            preserve
+            qui set obs `r'
         }
     }
     tempname by plot at mlbl mlpos b V se t df pval eq grp
@@ -2390,19 +2416,15 @@ void coefplot_keepdrop(struct coefplot_struct scalar C)
     // - remove omitted
     p = J(r, 1, 1)
     if (st_local("omitted")=="") {
-        p = p :* (!strmatch(coefnm, "*o.*"))
+        p = p :* (!strmatch(coefnm, "*o.*") :| b:!=0)
     }
-    else {
-        coefnm = substr(coefnm, 1:+2*(substr(coefnm, 1, 2):=="o."), .) // o.
-        coefnm = subinstr(coefnm, "o.", ".")                           // #o.
-    }
+    coefnm = substr(coefnm, 1:+2*(substr(coefnm, 1, 2):=="o."), .) // o.
+    coefnm = subinstr(coefnm, "o.", ".")                           // #o.
     // - remove baselevels
     if (st_local("baselevels")=="") {
-        p = p :* (!strmatch(coefnm, "*b.*"))
+        p = p :* (!strmatch(coefnm, "*b.*") :| b:!=0)
     }
-    else {
-        coefnm = subinstr(coefnm, "b.", ".")    // #b.
-    }
+    coefnm = subinstr(coefnm, "b.", ".")    // #b.
     // keep
     firsteqonly = 1
     keep = st_local("keep")

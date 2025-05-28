@@ -23,6 +23,15 @@ Installation from GitHub:
 
 Main changes:
 
+    28may2025 (1.8.7)
+    - coefplot could be slow in large datasets because unused observations were
+      eliminated only after collecting the results; to improve performance, coefplot
+      now removes all observations before doing anything else (making use of frames
+      Stata 16 or newer)
+    - unless -baselevels- or -omitted- was specified, coefplot dropped all
+      coefficients containing a "b." or "o." flag; such coefficients are now
+      only dropped if their value is zero
+  
     22feb2023 (1.8.6)
     - option rename() could break if all coefficients of a model were subject to
       renaming; this is fixed

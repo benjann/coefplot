@@ -3,6 +3,6 @@ d coefplot: module for plotting regression coefficients and other results
 d 
 d Author: Ben Jann, University of Bern, ben.jann@unibe.ch
 d
-d Distribution-Date: 20230222
+d Distribution-Date: 20250528
 f coefplot.ado
 f coefplot.sthlp

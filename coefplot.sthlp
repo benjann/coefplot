@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.5.2  21apr2022 Ben Jann}{...}
+{* *! version 1.5.3  28may2025  Ben Jann}{...}
 {vieweralsosee "[G-2] graph" "help graph"}{...}
 {vieweralsosee "[R] estimates" "help estimates"}{...}
 {vieweralsosee "[R] marginsplot" "help marginsplot"}{...}
@@ -299,7 +299,7 @@
     {p_end}
 
 {syntab:Add plots}
-{synopt:{helpb addplot_option:addplot({it:plot})}}add other plots to the
+{synopt:{helpb coefplot##addplot:addplot({it:plot})}}add other plots to the
     graph
     {p_end}
 {synopt:{helpb coefplot##nodrop:nodrop}}do not drop observations
@@ -738,7 +738,7 @@
     {helpb coefplot##transform:transform()},
     {helpb marker_label_options:mlabel()},
     {helpb marker_label_options:mlabvposition()}, and
-    {helpb addplot_option:addplot()} (see
+    {helpb coefplot##addplot:addplot()} (see
     {help coefplot##tempvar:Accessing internal temporary variables}
     below). In matrix mode (see
     {help coefplot##matrix:{it:Plotting results from matrices}} below), you may
@@ -1385,7 +1385,9 @@
 {phang}
     {cmd:generate}[{cmd:(}{it:prefix}{cmd:)}] generates variables containing
     the graph data. The variable names will be prefixed by "{cmd:__}"
-    or as specified by {it:prefix}.
+    or as specified by {it:prefix}. {cmd:generate()} implies
+    {helpb coefplot##nodrop:nodrop} and can make {cmd:coefplot} slow in large
+    datasets.
 
 {marker replace}{...}
 {phang}
@@ -1394,22 +1396,18 @@
 {marker addplot}{...}
 {phang}
     {cmd:addplot(}{it:plot}{cmd:)} adds other plots to the graph. See help
-    {it:{help addplot_option}}. By default {cmd:addplot()} has access only to
-    the first {it:r} observations in the dataset, where {it:r} is the number of
-    observations used by {cmd:coefplot} to store its internal results. If the
-    graph does not contain multiple subgraphs and
-    {helpb coefplot##generate:generate()} or {helpb coefplot##nodrop:nodrop} is
-    specified, {cmd:addplot()} has access to all observations.
+    {it:{help addplot_option}}. By default {cmd:coefplot} does not keep the
+    original data so that {cmd:addplot()} has access only to data from
+    {help coefplot##tempvar:internal temporary variables}. Specify
+    {helpb coefplot##nodrop:nodrop} to keep the original data.
 
 {marker nodrop}{...}
 {phang}
-    {cmd:nodrop} causes {cmd:coefplot} to keep all observations when generating
-    the graph. The default is to eliminate unused observations temporarily
+    {cmd:nodrop} causes {cmd:coefplot} to keep the original data when generating
+    the graph. The default is to eliminate all existing observations temporarily
     to increase speed. {cmd:nodrop} may be useful in connection with the
-    {helpb coefplot##addplot:addplot()} option, if the graph does not contain
-    multiple subgraphs. {cmd:nodrop} has no effect if
-    {helpb coefplot##generate:generate()} is specified.
-    {p_end}
+    {helpb coefplot##addplot:addplot()} option (unless the graph contains
+    multiple subgraphs).
 
 {phang}
     {it:twoway_options} are general twoway options, other than
@@ -1726,7 +1724,7 @@
     {helpb coefplot##transform:transform()},
     {helpb marker_label_options:mlabel()},
     {helpb marker_label_options:mlabvposition()}, and
-    {helpb addplot_option:addplot()}. These
+    {helpb coefplot##addplot:addplot()}. These
     variables are:
 
 {p2colset 9 21 23 2}{...}
