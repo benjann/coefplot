@@ -1,7 +1,11 @@
-*! version 1.8.7  28may2025  Ben Jann
+*! version 1.8.8  22aug2025  Ben Jann
 
 program coefplot
     version 11
+    if _N==0 {
+        _coefplot `macval(0)'
+        exit
+    }
     parse_nodrop `macval(0)' // returns nodrop
     if "`nodrop'"!="" {
         _coefplot `macval(0)'

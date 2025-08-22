@@ -23,6 +23,11 @@ Installation from GitHub:
 
 Main changes:
 
+
+    22aug2025 (1.8.8)
+    - coefplot 1.8.7 cashed if the current data contained 0 observations; this is
+      fixed
+
     28may2025 (1.8.7)
     - coefplot could be slow in large datasets because unused observations were
       eliminated only after collecting the results; to improve performance, coefplot
